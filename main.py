@@ -1,12 +1,11 @@
 #This file is created by: Josiah Cha
 
 import pygame as pg
-#WEIGHT AND HEIGHT from external source
-from settings import*
-from sprites import*
-from random import randint
-from tilemap import*
+from settings import *
+from sprites import *
+from tilemap import *
 from os import path
+from random import randint
 
 #Defined class
 class Game:
@@ -33,21 +32,31 @@ class Game:
         self.all_walls = pg.sprite.Group()
         self.all_mobs = pg.sprite.Group()
         self.all_powerups = pg.sprite.Group()
-        # self.player = Player(self, 1, 1)
+        self.all_coins = pg.sprite.Group()
+        #self.player = Player(self, 1, 1)
         # instantiated a mob
-        # self.mob = Mob(self, 100,100)
-        # makes new mobs and walls using a for loop
-        # for i in range(randint(10,20)):
-        #     m = Mob(self, i*randint(0, 200), i*randint(0, 200))
-        #     Wall(self, i*TILESIZE, i*TILESIZE)
-        
-    def run(self):
-    #Starts the game, is the main game loop, and runs the game as a boolean (True or False, game is continuing or not)
-        while self.running:
-            self.dt = self.clock.tick(FPS) / 1000
-            self.events()
-            self.update()
-            self.draw()
+        #self.mob = Mob(self, 100,100)
+        #makes new mobs and walls using a for loop
+        #for i in range(randint(10,20)):
+            #m = Mob(self, i*randint(0, 200), i*randint(0, 200))
+            #Wall(self, i*TILESIZE, i*TILESIZE)
+        for row, tiles in enumerate(self.map.data):
+            print(row)
+            for col, tile in enumerate(tiles):
+                print(col)
+                if tile == '1':
+                    Wall(self, col, row)
+                if tile == 'P':
+                    self.player = Player(self, col, row)
+                if tile == 'M':
+                    Mob(self, col, row)
+                if tile == 'U':
+                    Powerup(self, col, row)
+                if tile == 'C':
+                    Coin(self, col, row)
+
+
+            
     def events(self):
         #Closes the game with the X button
         for event in pg.event.get():
@@ -68,21 +77,28 @@ class Game:
     pg.quit()
         #output
 
-    def draw_text(self, text, font_name, size, color, x, y,):
-        fonet_name = pg.font.match_font('ariel')
-        font = pg.font.Font(fonet_name, size)
+    def run(self):
+    #Starts the game, is the main game loop, and runs the game as a boolean (True or False, game is continuing or not)
+        while self.running:
+            self.dt = self.clock.tick(FPS) / 1000
+            self.events()
+            self.update()
+            self.draw()
+
+    def draw_text(self, surface, text, size, color, x, y):
+        font_name = pg.font.match_font('arial')
+        font = pg.font.Font(font_name, size)
         text_surface = font.render(text, True, color)
         text_rect = text_surface.get_rect()
-        text_rect.midtop = (x, y)
-        self.screen.blit(text_surface, text_rect)
-
+        text_rect.midtop = (x,y)
+        surface.blit(text_surface, text_rect)
     def draw(self):
-        #Fills the screen with color
-        #WHITE and BLACK in Settings.py
         self.screen.fill(BLACK)
-        self.draw_text(self.screen, self.dt, 24, WHITE, WIDTH/2, 10)
         self.all_sprites.draw(self.screen)
+        self.draw_text(self.screen, str(self.dt*1000), 24, WHITE, WIDTH/30, HEIGHT/30)
+        self.draw_text(self.screen, "Coins collected: " + str(self.player.coins), 24, WHITE, WIDTH/2, HEIGHT/24)
         pg.display.flip()
+
 
  #If is a formaility and checks the file name (If the name of the file is main.py)       
 if __name__ == "__main__": #Runs the game
