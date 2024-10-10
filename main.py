@@ -6,6 +6,22 @@ from sprites import *
 from tilemap import *
 from os import path
 from random import randint
+'''
+Elevator pitch: I want to create a pong game that has diffrent power ups to give the player a new expierience each time they play.
+
+GOALS: Get the ball to the other side of the screen
+RULES: move up and down, can't cross the border between Player 1 and Player 2
+FEEDBACK: Hits the ball to other side
+FREEDOM: x and y movement with WASD and/or IJKL
+
+What sentence does your game make?
+Hit the ball with player bounce ball to other side
+Hit side of wall bounces ball to other side
+Hits power up, gives effect to either the ball, the player, or the walls
+
+Alpha goal:To create a border to seperate Player 1 and Player 2
+
+'''
 
 #Defined class
 class Game:
