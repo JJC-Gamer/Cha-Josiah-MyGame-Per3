@@ -46,9 +46,10 @@ class Game:
         print(self.map.data)
         self.all_sprites = pg.sprite.Group()
         self.all_walls = pg.sprite.Group()
-        self.all_mobs = pg.sprite.Group()
         self.all_powerups = pg.sprite.Group()
-        self.all_coins = pg.sprite.Group()
+        self.all_players1 = pg.sprite.Group()
+        self.all_players2 = pg.sprite.Group()
+        self.all_balls = pg.sprite.Group()
         #self.player = Player(self, 1, 1)
         # instantiated a mob
         #self.mob = Mob(self, 100,100)
@@ -60,16 +61,16 @@ class Game:
             print(row)
             for col, tile in enumerate(tiles):
                 print(col)
-                if tile == '1':
+                if tile == 'W':
                     Wall(self, col, row)
                 if tile == 'P':
                     self.player = Player(self, col, row)
                 if tile == 'M':
-                    Mob(self, col, row)
+                    self.player2 = Player2(self, col, row)
                 if tile == 'U':
                     Powerup(self, col, row)
-                if tile == 'C':
-                    Coin(self, col, row)
+                if tile == 'B':
+                    Ball(self, col, row)
 
 
             
@@ -112,7 +113,8 @@ class Game:
         self.screen.fill(BLACK)
         self.all_sprites.draw(self.screen)
         self.draw_text(self.screen, str(self.dt*1000), 24, WHITE, WIDTH/30, HEIGHT/30)
-        self.draw_text(self.screen, "Coins collected: " + str(self.player.coins), 24, WHITE, WIDTH/2, HEIGHT/24)
+        self.draw_text(self.screen, "Player 1 points: " + str(self.player.points), 24, WHITE, WIDTH/4, HEIGHT/24)
+        self.draw_text(self.screen, "Player 2 points: " + str(self.player.points), 24, WHITE, WIDTH/1.33, HEIGHT/24)
         pg.display.flip()
 
 
