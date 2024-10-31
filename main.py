@@ -44,12 +44,14 @@ class Game:
     def new(self):
         self.load_data()
         print(self.map.data)
+        self.all_balls = pg.sprite.Group()
         self.all_sprites = pg.sprite.Group()
         self.all_walls = pg.sprite.Group()
         self.all_powerups = pg.sprite.Group()
+        self.all_players = pg.sprite.Group()
         self.all_players1 = pg.sprite.Group()
         self.all_players2 = pg.sprite.Group()
-        self.all_balls = pg.sprite.Group()
+        self.all_borders = pg.sprite.Group()
         #self.player = Player(self, 1, 1)
         # instantiated a mob
         #self.mob = Mob(self, 100,100)
@@ -61,6 +63,8 @@ class Game:
             print(row)
             for col, tile in enumerate(tiles):
                 print(col)
+                if tile == 'B':
+                    Ball(self, col, row)
                 if tile == 'W':
                     Wall(self, col, row)
                 if tile == 'P':
@@ -68,9 +72,9 @@ class Game:
                 if tile == 'M':
                     self.player2 = Player2(self, col, row)
                 if tile == 'U':
-                    Powerup(self, col, row)
-                if tile == 'B':
-                    Ball(self, col, row)
+                    random.randint(0, 2) and Powerup(self, col, row)
+                if tile == 'X':
+                    Border(self, col, row)
 
 
             
@@ -113,8 +117,6 @@ class Game:
         self.screen.fill(BLACK)
         self.all_sprites.draw(self.screen)
         self.draw_text(self.screen, str(self.dt*1000), 24, WHITE, WIDTH/30, HEIGHT/30)
-        self.draw_text(self.screen, "Player 1 points: " + str(self.player.points), 24, WHITE, WIDTH/4, HEIGHT/24)
-        self.draw_text(self.screen, "Player 2 points: " + str(self.player.points), 24, WHITE, WIDTH/1.33, HEIGHT/24)
         pg.display.flip()
 
 
@@ -123,3 +125,4 @@ if __name__ == "__main__": #Runs the game
     g = Game() #Creates all game elements with the new method (Not a function)
     g.new()
     g.run()
+

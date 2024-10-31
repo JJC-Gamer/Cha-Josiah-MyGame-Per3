@@ -19,3 +19,13 @@ What does class Game do? Why write game?
 
 
 '''
+
+'''
+Gravity
+Go to Sprites
+
+vec = pg.math.Vector2
+self.pos(x*TILESIZE, y*TILESIZE)
+self.vec = vec(0,0)
+self.acc(0,0)
+'''
