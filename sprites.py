@@ -1,11 +1,14 @@
 #This file was created by: Josiah Cha
 
 import pygame as pg
+from pygame.locals import *
+from pygame.rect import *
 from pygame.sprite import Sprite
 #Sprite is a super class (Daddy class)
 from settings import *
 #* = EVERYTHING
 import random
+from main import Game
 
 class Player(Sprite):
     def __init__(self, game, x, y):
@@ -196,9 +199,6 @@ class Player2(Sprite):
         self.collide_with_walls('y')
 
         self.get_points()
-        
-
-
 
 
 #This is Wall
@@ -258,6 +258,7 @@ class Ball(Sprite):
         self.y = y * TILESIZE
         self.speed = 10
         self.vx, self.vy = 0, 0
+        self.hit_counter = 0
     
     def reset(self):
         if self.rect.right > WIDTH + 10:
@@ -275,18 +276,32 @@ class Ball(Sprite):
             self.rect = self.image.get_rect()
             self.image.fill(WHITE)
             self.speed = 10
+        if self.rect.top < -10:
+            self.rect.y = self.y
+            self.vy *= 0
+            self.image = pg.Surface((TILESIZE, TILESIZE))
+            self.rect = self.image.get_rect()
+            self.image.fill(WHITE)
+            self.speed = 10
+        if self.rect.bottom > HEIGHT + 10:
+            self.rect.y = self.y
+            self.vy *= 0
+            self.image = pg.Surface((TILESIZE, TILESIZE))
+            self.rect = self.image.get_rect()
+            self.image.fill(WHITE)
+            self.speed = 10
 
     def collide_with_walls(self, dir):
-        #if dir == 'x':
-            #hits = pg.sprite.spritecollide(self, self.game.all_walls, False)
-            #if hits:
-                #if self.vx > 0:
-                    #self.x = hits[0].rect.left - TILESIZE
-                    # self.x = hits[0].rect.left - self.rect.width
-                #if self.vx < 0:
-                    #self.x = hits[0].rect.right
-                #self.vx = 0
-                #self.rect.x = self.x
+        # if dir == 'x':
+        #     hits = pg.sprite.spritecollide(self, self.game.all_walls, False)
+        #     if hits:
+        #         if self.vx > 0:
+        #             self.x = hits[0].rect.left - TILESIZE
+        #             self.x = hits[0].rect.left - self.rect.width
+        #         if self.vx < 0:
+        #             self.x = hits[0].rect.right
+        #         self.vx = 0
+        #         self.rect.x = self.x
         if dir == 'y':
             hits = pg.sprite.spritecollide(self, self.game.all_walls, False)
             if hits:
@@ -298,11 +313,15 @@ class Ball(Sprite):
                 self.vy *= -1
                 self.rect.y = self.y
 
-    def hits(self): #Rename method: all_hits?
+    def all_hits(self): #Rename method: all_hits?
         hits = pg.sprite.spritecollide(self, self.game.all_powerups, True)
         if hits: 
             if str(hits[0].__class__.__name__) == "Powerup": 
-                    effect = random.randint(1,3)
+                    self.hit_counter += 1
+                    if self.hit_counter > 1:
+                        self.effect = False
+                        self.hit_counter = 0
+                    effect = random.randint(1,4)
                     if effect == 1:
                         print('get faster...')
                         self.image.fill(PURPLE)
@@ -328,12 +347,38 @@ class Ball(Sprite):
                     if effect == 3: 
                             print('get bigger...')
                             self.image.fill(PINK)
-                            TILESIZE2 = TILESIZE * 2
-                            self.image = pg.transform.scale(self.image, (TILESIZE2, TILESIZE2)) 
+                            TILESIZE = 32 * 2
+                            self.image = pg.transform.scale_by(self.image, (2, 2)) 
+                            self.rect = self.image.get_rect()
                             old_center = hits[0].rect.center
                             hits[0].image = pg.transform.scale(hits[0].image, (64, 64))
                             hits[0].rect = hits[0].image.get_rect()
                             hits[0].rect.center = old_center
+                            self.rect.center = hits[0].rect.center
+                            # self.collide_with_walls(self, dir)
+                            # if dir == 'y':
+                            #         hits = pg.sprite.spritecollide(self, self.game.all_walls, False)
+                            #         if hits:
+                            #             if self.vy > 0:
+                            #                 self.y = hits[0].rect.top - TILESIZE 
+                            #                 # self.y = hits[0].rect.top - self.rect.height
+                            #             if self.vy < 0:
+                            #                 self.y = hits[0].rect.bottom
+                            #                 self.vy *= -1
+                            #                 self.rect.y = self.y
+                    if effect == 4:
+                            print('get smaller...')
+                            self.image.fill(BBLUE)
+                            TILESIZE = 32 / 2
+                            self.image = pg.transform.scale_by(self.image, (1/2, 1/2)) 
+                            self.rect = self.image.get_rect()
+                            old_center = hits[0].rect.center    
+                            hits[0].image = pg.transform.scale(hits[0].image, (16, 16))
+                            hits[0].rect = hits[0].image.get_rect()
+                            hits[0].rect.center = old_center
+                            self.rect.center = hits[0].rect.center
+                        
+            
         hits = pg.sprite.spritecollide(self, self.game.all_players, False)
         if hits:
             if str(hits[0].__class__.__name__) == "Player":
@@ -358,7 +403,7 @@ class Ball(Sprite):
         self.x += self.vx * self.game.dt
         self.y += self.vy * self.game.dt
 
-        self.hits()
+        self.all_hits()
 
         self.collide_with_walls('x')
         self.collide_with_walls('y')
@@ -370,6 +415,23 @@ class Ball(Sprite):
         if self.rect.bottom < 0:
             self.rect.bottom = 0
 
-
-
+class Button(Sprite):
+    def __init__(self, game, x, y):
+        self.game = game
+        self.groups = game.all_sprites, game.all_buttons
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.image = pg.Surface((TILESIZE, TILESIZE))
+        self.rect = self.image.get_rect()
+        self.image.fill(YELLOW)
+        self.rect.x = x * TILESIZE
+        self.rect.y = y * TILESIZE
+    def get_keys(self):
+        keys = pg.key.get_pressed()
+        if keys[pg.K_a]:
+            self.image.fill(RED)
+        if keys[pg.K_d]:
+            self.image.fill(GREEN)
+        if keys[pg.K_KP_ENTER]:
+            Game.new()
+            Game.run()
 

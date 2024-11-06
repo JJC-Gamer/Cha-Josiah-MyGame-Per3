@@ -22,6 +22,10 @@ Hits power up, gives effect to either the ball, the player, or the walls
 Alpha goal:To create a border to seperate Player 1 and Player 2
 
 '''
+'''
+Sources:
+Chirs Cozart - Collisions for effects
+'''
 
 #Defined class
 class Game:
@@ -37,10 +41,22 @@ class Game:
         #Start the Game
         self.running = True
 
+    def load_data_inro(self):
+        self.game_folder = path.dirname(__file__)
+        self.map = Map(path.join(self.game_folder, 'intro.txt'))
     def load_data(self):
         self.game_folder = path.dirname(__file__)
         self.map = Map(path.join(self.game_folder, 'level1.txt'))
         
+    def new_intro(self):
+        self.load_data_inro()
+        print(self.map.data)
+        self.all_buttons = pg.sprite.Group()
+        self.all_sprites = pg.sprite.Group()
+        for row, tiles in enumerate(self.map.data):
+            for col, tile in enumerate(tiles):
+                if tile == 'B':
+                    Button(self, col, row)
     def new(self):
         self.load_data()
         print(self.map.data)
@@ -72,7 +88,8 @@ class Game:
                 if tile == 'M':
                     self.player2 = Player2(self, col, row)
                 if tile == 'U':
-                    random.randint(0, 2) and Powerup(self, col, row)
+                    Powerup(self, col, row)
+                    # random.randint(0, 2) and Powerup(self, col, row)
                 if tile == 'X':
                     Border(self, col, row)
 
@@ -117,12 +134,15 @@ class Game:
         self.screen.fill(BLACK)
         self.all_sprites.draw(self.screen)
         self.draw_text(self.screen, str(self.dt*1000), 24, WHITE, WIDTH/30, HEIGHT/30)
+        self.draw_text(self.screen, "Player 1 points: " + str(self.player.points), 24, WHITE, WIDTH/4, HEIGHT/24)
+        self.draw_text(self.screen, "Player 2 points: " + str(self.player2.points), 24, WHITE, WIDTH/1.33, HEIGHT/24)
         pg.display.flip()
 
 
  #If is a formaility and checks the file name (If the name of the file is main.py)       
 if __name__ == "__main__": #Runs the game
     g = Game() #Creates all game elements with the new method (Not a function)
-    g.new()
-    g.run()
+    g.new_intro()
+    # g.new()
+    # g.run()
 
