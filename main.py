@@ -41,7 +41,7 @@ class Game:
         #Start the Game
         self.running = True
 
-    def load_data_inro(self):
+    def load_data_intro(self):
         self.game_folder = path.dirname(__file__)
         self.map = Map(path.join(self.game_folder, 'intro.txt'))
     def load_data(self):
@@ -49,14 +49,20 @@ class Game:
         self.map = Map(path.join(self.game_folder, 'level1.txt'))
         
     def new_intro(self):
-        self.load_data_inro()
+        self.load_data_intro()
         print(self.map.data)
         self.all_buttons = pg.sprite.Group()
         self.all_sprites = pg.sprite.Group()
+        self.all_walls = pg.sprite.Group()
         for row, tiles in enumerate(self.map.data):
+            print (row)
             for col, tile in enumerate(tiles):
-                if tile == 'B':
-                    Button(self, col, row)
+                print(col)
+                if tile == 'T':
+                    self.buttons = Button(self, col, row)
+                if tile == 'W':
+                    Wall(self, col, row)
+
     def new(self):
         self.load_data()
         print(self.map.data)
@@ -79,8 +85,6 @@ class Game:
             print(row)
             for col, tile in enumerate(tiles):
                 print(col)
-                if tile == 'B':
-                    Ball(self, col, row)
                 if tile == 'W':
                     Wall(self, col, row)
                 if tile == 'P':
@@ -92,6 +96,8 @@ class Game:
                     # random.randint(0, 2) and Powerup(self, col, row)
                 if tile == 'X':
                     Border(self, col, row)
+                if tile == 'B':
+                    Ball(self, col, row)
 
 
             
@@ -122,6 +128,11 @@ class Game:
             self.events()
             self.update()
             self.draw()
+    def run_intro(self):
+        while self.running:
+            self.events()
+            self.update()
+            self.draw_intro()
 
     def draw_text(self, surface, text, size, color, x, y):
         font_name = pg.font.match_font('arial')
@@ -130,6 +141,12 @@ class Game:
         text_rect = text_surface.get_rect()
         text_rect.midtop = (x,y)
         surface.blit(text_surface, text_rect)
+    def draw_intro(self):
+        self.screen.fill(BLACK)
+        self.draw_text(self.screen, 'Welcome to Pong:', 24, GREEN, WIDTH/2, HEIGHT/24)
+        self.draw_text(self.screen, 'WITH POWER UPS!!!!!!!', 24, RED, WIDTH/2, HEIGHT/10)
+        self.all_sprites.draw(self.screen)
+        pg.display.flip()
     def draw(self):
         self.screen.fill(BLACK)
         self.all_sprites.draw(self.screen)
@@ -143,6 +160,8 @@ class Game:
 if __name__ == "__main__": #Runs the game
     g = Game() #Creates all game elements with the new method (Not a function)
     g.new_intro()
-    # g.new()
-    # g.run()
+    g.run_intro()
+    
+
+
 

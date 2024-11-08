@@ -420,18 +420,27 @@ class Button(Sprite):
         self.game = game
         self.groups = game.all_sprites, game.all_buttons
         pg.sprite.Sprite.__init__(self, self.groups)
-        self.image = pg.Surface((TILESIZE, TILESIZE))
+        self.image = pg.Surface((64, TILESIZE))
         self.rect = self.image.get_rect()
         self.image.fill(YELLOW)
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
+        self.width = self.rect.width
+        self.count = 0
     def get_keys(self):
         keys = pg.key.get_pressed()
         if keys[pg.K_a]:
-            self.image.fill(RED)
-        if keys[pg.K_d]:
             self.image.fill(GREEN)
-        if keys[pg.K_KP_ENTER]:
-            Game.new()
+            self.count += 1
+        if keys[pg.K_d]:
+            self.image.fill(RED)
+    def enter(self):
+        keys = pg.key.get_pressed()
+        if keys[pg.K_s]:
             Game.run()
+            Game.draw()
 
+    def update(self): 
+        self.get_keys()
+        if self.count < 0:
+            self.enter()
