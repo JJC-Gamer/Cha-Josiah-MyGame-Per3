@@ -135,6 +135,7 @@ class Game:
             self.draw_intro()
 
     def draw_text(self, surface, text, size, color, x, y):
+        
         font_name = pg.font.match_font('arial')
         font = pg.font.Font(font_name, size)
         text_surface = font.render(text, True, color)
@@ -162,6 +163,4 @@ if __name__ == "__main__": #Runs the game
     g.new_intro()
     g.run_intro()
     
-
-
 

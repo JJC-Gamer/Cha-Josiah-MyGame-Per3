@@ -434,11 +434,16 @@ class Button(Sprite):
             self.count += 1
         if keys[pg.K_d]:
             self.image.fill(RED)
+            self.count -= 1
     def enter(self):
-        keys = pg.key.get_pressed()
-        if keys[pg.K_s]:
-            Game.run()
-            Game.draw()
+        if self.count > 0:
+            keys = pg.key.get_pressed()
+            if keys[pg.K_s]:
+                Game.load_data()
+                Game.run()
+                Game.draw()
+        if self.count == 0:
+            pass
 
     def update(self): 
         self.get_keys()
