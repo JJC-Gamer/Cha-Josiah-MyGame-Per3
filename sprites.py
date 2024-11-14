@@ -9,6 +9,7 @@ from settings import *
 #* = EVERYTHING
 import random
 from main import Game
+import math
 
 class Player(Sprite):
     def __init__(self, game, x, y):
@@ -425,27 +426,49 @@ class Button(Sprite):
         self.image.fill(YELLOW)
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
-        self.width = self.rect.width
-        self.count = 0
+    def update(self):
+        pass
+
+class Pusher(Sprite):
+    def __init__(self, game, x, y):    
+        self.game = game
+        self.groups = game.all_sprites, game.all_pushers
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.image = pg.Surface((TILESIZE, TILESIZE))
+        self.rect = self.image.get_rect()
+        self.image.fill(WHITE)
+        self.rect.x = x * TILESIZE
+        self.rect.y = y * TILESIZE
+        self.speed = 10
+        self.x = x * TILESIZE
+        self.vx, self.vy = 0, 0
     def get_keys(self):
         keys = pg.key.get_pressed()
         if keys[pg.K_a]:
-            self.image.fill(GREEN)
-            self.count += 1
+            self.rect.x += self.vx
+            self.vx -= self.speed
         if keys[pg.K_d]:
-            self.image.fill(RED)
-            self.count -= 1
-    def enter(self):
-        if self.count > 0:
-            keys = pg.key.get_pressed()
-            if keys[pg.K_s]:
-                Game.load_data()
-                Game.run()
-                Game.draw()
-        if self.count == 0:
-            pass
+            self.rect.x += self.vx
+            self.vx += self.speed
+    
+    def enter(self, group, kill):
+        hits = pg.sprite.spritecollide(self, self.game.all_buttons, True)
+        if hits: 
+            if str(hits[0].__class__.__name__) == "Button":
+                # self.game.new()
+                print(self.game.level)
+                self.game.level += 1
+                textLevel = "level" + str(self.game.level) + ".txt"
+                self.game.load_data(textLevel)
+                self.game.new()
+                print(textLevel)
 
     def update(self): 
         self.get_keys()
-        if self.count < 0:
-            self.enter()
+
+        self.x += self.vx * self.game.dt
+
+        self.enter(self.game.all_buttons, True) 
+
+
+
