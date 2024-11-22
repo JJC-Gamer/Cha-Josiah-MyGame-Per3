@@ -141,6 +141,7 @@ class Player2(Sprite):
         self.speed = 15
         self.points = 0
         self.vx, self.vy = 0, 0
+        self.effect = Ball.effect
     def get_keys(self):
         keys = pg.key.get_pressed()
         if keys[pg.K_i]:
@@ -186,8 +187,14 @@ class Player2(Sprite):
         if keys[pg.K_j]:
             self.x += self.speed
     def update(self):
-        self.get_keys()
 
+        if self.effect >5 or self.effect < 5:
+            self.get_keys()
+
+        if self.effect == 5:
+            self.get_keys2()
+
+            
 
         self.x += self.vx * self.game.dt
         self.y += self.vy * self.game.dt
@@ -259,7 +266,8 @@ class Ball(Sprite):
         self.y = y * TILESIZE
         self.speed = 10
         self.vx, self.vy = 0, 0
-        self.hit_counter = 0
+        self.hit_counter = 0        
+        Ball.effect = 0
     
     def reset(self):
         if self.rect.right > WIDTH + 10:
@@ -322,7 +330,7 @@ class Ball(Sprite):
                     if self.hit_counter > 1:
                         self.effect = False
                         self.hit_counter = 0
-                    effect = random.randint(1,4)
+                    self.effect = effect = random.randint(5,5)
                     if effect == 1:
                         print('get faster...')
                         self.image.fill(PURPLE)
@@ -378,6 +386,11 @@ class Ball(Sprite):
                             hits[0].rect = hits[0].image.get_rect()
                             hits[0].rect.center = old_center
                             self.rect.center = hits[0].rect.center
+                    if effect == 5:
+                            print('Switch keys...')
+                            self.image.fill(LGREEN)                          
+                            
+                            
                         
             
         hits = pg.sprite.spritecollide(self, self.game.all_players, False)
