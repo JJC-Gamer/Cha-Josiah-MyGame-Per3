@@ -1,6 +1,7 @@
 #This file was created by: Josiah Cha
 
 import pygame as pg
+from pygame import *
 from pygame.locals import *
 from pygame.rect import *
 from pygame.sprite import Sprite
@@ -141,7 +142,7 @@ class Player2(Sprite):
         self.speed = 15
         self.points = 0
         self.vx, self.vy = 0, 0
-        self.effect = Ball.effect
+        Ball.effect
     def get_keys(self):
         keys = pg.key.get_pressed()
         if keys[pg.K_i]:
@@ -188,14 +189,8 @@ class Player2(Sprite):
             self.x += self.speed
     def update(self):
 
-        if self.effect >5 or self.effect < 5:
-            self.get_keys()
-
-        if self.effect == 5:
-            self.get_keys2()
-
-            
-
+        self.get_keys()
+        
         self.x += self.vx * self.game.dt
         self.y += self.vy * self.game.dt
         # reverse order to fix collision issues
@@ -330,7 +325,7 @@ class Ball(Sprite):
                     if self.hit_counter > 1:
                         self.effect = False
                         self.hit_counter = 0
-                    self.effect = effect = random.randint(5,5)
+                    self.effect = effect = random.randint(1,6)
                     if effect == 1:
                         print('get faster...')
                         self.image.fill(PURPLE)
@@ -387,8 +382,21 @@ class Ball(Sprite):
                             hits[0].rect.center = old_center
                             self.rect.center = hits[0].rect.center
                     if effect == 5:
-                            print('Switch keys...')
-                            self.image.fill(LGREEN)                          
+                            print('get taller...')
+                            self.image.fill(BLUE)
+                            TILESIZE = 32 * 2
+                            self.image = pg.transform.scale_by(self.image, (1, 2)) 
+                            self.rect = self.image.get_rect()
+                            old_center = hits[0].rect.center
+                            hits[0].image = pg.transform.scale(hits[0].image, (32, 64))
+                            hits[0].rect = hits[0].image.get_rect()
+                            hits[0].rect.center = old_center
+                            self.rect.center = hits[0].rect.center
+                    if effect == 6:
+                            print('relfect...')
+                            self.speed *= -1
+
+                                                     
                             
                             
                         
@@ -400,7 +408,10 @@ class Ball(Sprite):
                 # print("off the screen...")
                 self.speed *= -1
                 self.rect.x += 32
-                self.vy *= -1
+                self.vy *= 1
+                if self.vy == 0:
+                    self.vy += self.speed
+                pg.mixer.Sound.play(self.game.ball_ping_snd)
             if str(hits[0].__class__.__name__) == "Player2":
             # when it hits the player2, it will move other side
                 #print("off the screen...")
@@ -408,6 +419,9 @@ class Ball(Sprite):
                 self.rect.x -= 32
                 self.vy += self.speed
                 self.vy *= -1
+                if self.vy == 0:
+                    self.vy += self.speed
+                pg.mixer.Sound.play(self.game.ball_ping_snd)
 
 
     def update(self):

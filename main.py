@@ -50,6 +50,18 @@ class Game:
     def load_data(self, level):
         self.game_folder = path.dirname(__file__)
         self.map = Map(path.join(self.game_folder, level))
+        self.img_folder = path.join(self.game_folder, 'images')
+        self.snd_folder = path.join(self.game_folder, 'sound')
+        self.ball_ping_snd = pg.mixer.Sound(path.join(self.game_folder, 'ball_ping.wav'))
+        self.game_music = pg.mixer.Sound(path.join(self.game_folder, 'game_music.wav'))
+        self.game_music2 = pg.mixer.Sound(path.join(self.game_folder, 'game_music2.wav'))
+        if self.level == 2:
+            pg.mixer.Sound.play(self.game_music)
+            pg.mixer.Sound.stop(self.game_music2)
+        else:
+            pg.mixer.Sound.play(self.game_music2)
+
+            
         print ('load data')
          
     def new(self):
