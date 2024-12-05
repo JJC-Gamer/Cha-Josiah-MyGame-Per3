@@ -61,6 +61,7 @@ class Player(Sprite):
     def get_points(self):
         if self.game.all_balls.sprites()[0].rect.right > WIDTH:
             self.points += 1
+            self.game.highscore += 1
 
     '''
     def get_keys(self):
@@ -177,6 +178,7 @@ class Player2(Sprite):
     def get_points(self):
         if  self.game.all_balls.sprites()[0].rect.left < 0:
             self.points += 1
+            self.game.highscore += 1
     def get_keys2(self):
         keys = pg.key.get_pressed()
         if keys[pg.K_k]:
@@ -483,6 +485,7 @@ class Pusher(Sprite):
         if hits: 
             if str(hits[0].__class__.__name__) == "Button":
                 # self.game.new()
+                #From Ethan Chan 
                 print(self.game.level)
                 self.game.level += 1
                 textLevel = "level" + str(self.game.level) + ".txt"

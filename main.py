@@ -48,7 +48,15 @@ class Game:
     #     self.game_folder = path.dirname(__file__)
     #     self.map = Map(path.join(self.game_folder, 'level0.txt'))
     def load_data(self, level):
+        self.highscore = 0
         self.game_folder = path.dirname(__file__)
+        #Load high score file
+        with open(path.join(self.game_folder, HS_FILE), 'w') as f:
+            f.write(str(self.highscore)) #Write the text in the high score file
+            # try: 
+            #     self.highscore = int(f.read())
+            # except: 
+            #     self.highscore = 0
         self.map = Map(path.join(self.game_folder, level))
         self.img_folder = path.join(self.game_folder, 'images')
         self.snd_folder = path.join(self.game_folder, 'sound')
@@ -93,8 +101,8 @@ class Game:
                 if tile == 'M':
                     self.player2 = Player2(self, col, row)
                 if tile == 'U':
-                    Powerup(self, col, row)
-                    # random.randint(0, 2) and Powerup(self, col, row)
+                    # Powerup(self, col, row)
+                    random.randint(0, 2) and Powerup(self, col, row)
                 if tile == 'X':
                     Border(self, col, row)
                 if tile == 'B':
@@ -106,6 +114,9 @@ class Game:
         #Closes the game with the X button
         for event in pg.event.get():
             if event.type == pg.QUIT:
+                # self.highscore = self.player.points and self.player2.points
+                # with open(path.join(self.dir, HS_FILE), 'w') as f:
+                #     f.write(str(self.highscore))
                 self.running = False
         
         #input
@@ -152,7 +163,13 @@ class Game:
             self.draw_text(self.screen, "Player 1 points: " + str(self.player.points), 24, WHITE, WIDTH/4, HEIGHT/24)
             self.draw_text(self.screen, "Player 2 points: " + str(self.player2.points), 24, WHITE, WIDTH/1.33, HEIGHT/24)
             pg.display.flip()
-
+        if self.level == 3:
+            self.screen.fill(WHITE)
+            self.all_sprites.draw(self.screen)
+            self.draw_text(self.screen, str(self.dt*1000), 24, WHITE, WIDTH/30, HEIGHT/30)
+            self.draw_text(self.screen, "Player 1 points: " + str(self.player.points), 24, WHITE, WIDTH/4, HEIGHT/24)
+            self.draw_text(self.screen, "Player 2 points: " + str(self.player2.points), 24, WHITE, WIDTH/1.33, HEIGHT/24)
+            pg.display.flip()
 
  #If is a formaility and checks the file name (If the name of the file is main.py)       
 if __name__ == "__main__": #Runs the game
