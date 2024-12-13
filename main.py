@@ -19,12 +19,10 @@ Hit the ball with player bounce ball to other side
 Hit side of wall bounces ball to other side
 Hits power up, gives effect to either the ball, the player, or the walls
 
-Alpha goal:To create a border to seperate Player 1 and Player 2
-
 '''
 '''
 Sources:
-Chirs Cozart - Collisions for effects
+Chirs Cozart - Collisions for effects, High Score
 Ethan Chan - Title Screen
 '''
 
@@ -86,6 +84,7 @@ class Game:
         self.all_players1 = pg.sprite.Group()
         self.all_players2 = pg.sprite.Group()
         self.all_borders = pg.sprite.Group()
+        self.all_wallos = pg.sprite.Group()
         for row, tiles in enumerate(self.map.data):
             print (row)
             for col, tile in enumerate(tiles):
@@ -94,6 +93,8 @@ class Game:
                     self.pushers = Pusher(self, col, row)
                 if tile == 'T':
                     self.buttons = Button(self, col, row)
+                if tile == 'R':
+                    self.buttons2 = Button2(self, col, row)
                 if tile == 'W':
                     Wall(self, col, row)
                 if tile == 'P':
@@ -107,6 +108,8 @@ class Game:
                     Border(self, col, row)
                 if tile == 'B':
                     Ball(self, col, row)
+                if tile == 'Y':
+                    Wallo(self, col, row)
 
     
             
@@ -141,6 +144,7 @@ class Game:
             self.update()
             self.input()
             self.draw_intro()
+
     def draw_text(self, surface, text, size, color, x, y):
         
         font_name = pg.font.match_font('arial')
@@ -164,16 +168,27 @@ class Game:
             self.draw_text(self.screen, "Player 2 points: " + str(self.player2.points), 24, WHITE, WIDTH/1.33, HEIGHT/24)
             pg.display.flip()
         if self.level == 3:
-            self.screen.fill(WHITE)
+            self.screen.fill(BLACK)
             self.all_sprites.draw(self.screen)
             self.draw_text(self.screen, str(self.dt*1000), 24, WHITE, WIDTH/30, HEIGHT/30)
-            self.draw_text(self.screen, "Player 1 points: " + str(self.player.points), 24, WHITE, WIDTH/4, HEIGHT/24)
-            self.draw_text(self.screen, "Player 2 points: " + str(self.player2.points), 24, WHITE, WIDTH/1.33, HEIGHT/24)
+            self.draw_text(self.screen, "Player 1 points: " + str(self.all_players1.points), 24, WHITE, WIDTH/4, HEIGHT/24)
+            # self.draw_text(self.screen, "Player 2 points: " + str(self.player2.points), 24, WHITE, WIDTH/1.33, HEIGHT/24)
             pg.display.flip()
+        if self.level == 4:
+            self.screen.fill(BLACK)
+            self.all_sprites.draw(self.screen)
+            self.draw_text(self.screen, str(self.dt*1000), 24, WHITE, WIDTH/30, HEIGHT/30)
+            self.draw_text(self.screen, "Player 2 points: " + str(self.player2.points), 24, WHITE, WIDTH/4, HEIGHT/24)
+            self.draw_text(self.screen, "Player 1 points: " + str(self.player.points), 24, WHITE, WIDTH/1.33, HEIGHT/24)
+            pg.display.flip()
+
 
  #If is a formaility and checks the file name (If the name of the file is main.py)       
 if __name__ == "__main__": #Runs the game
     g = Game() #Creates all game elements with the new method (Not a function)
     g.new()
     g.run()
-    
+    keys = pg.key.get_pressed()
+    if keys[pg.K_r]:
+        g.new()
+        g.run()

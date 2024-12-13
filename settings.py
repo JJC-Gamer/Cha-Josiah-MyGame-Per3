@@ -18,3 +18,5 @@ ORANGE = (255, 153, 0)
 PURPLE = (153, 0, 153)
 BBLUE = (155,155,255)
 LGREEN = (155, 255, 155)
+
+HS_FILE = "highscore.txt" 

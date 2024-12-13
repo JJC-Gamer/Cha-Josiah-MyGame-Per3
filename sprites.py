@@ -59,9 +59,17 @@ class Player(Sprite):
                 self.vy = 0
                 self.rect.y = self.y
     def get_points(self):
-        if self.game.all_balls.sprites()[0].rect.right > WIDTH:
+        if self.game.all_balls.effect == 5:
+            if self.game.all_balls.sprites()[0].rect.left < 0:
+                self.game.all_players1.points += 1
+                self.game.highscore += 1
+        elif self.game.all_balls.sprites()[0].rect.right > WIDTH:
             self.points += 1
             self.game.highscore += 1
+
+
+        
+        
 
     '''
     def get_keys(self):
@@ -99,11 +107,6 @@ class Player(Sprite):
         self.collide_with_walls('y')
 
         self.get_points()
-
-
-
-
-
 
         '''
                 self.vx += self.vx * self.game.dt
@@ -143,7 +146,6 @@ class Player2(Sprite):
         self.speed = 15
         self.points = 0
         self.vx, self.vy = 0, 0
-        Ball.effect
     def get_keys(self):
         keys = pg.key.get_pressed()
         if keys[pg.K_i]:
@@ -176,9 +178,14 @@ class Player2(Sprite):
                 self.vy = 0
                 self.rect.y = self.y
     def get_points(self):
-        if  self.game.all_balls.sprites()[0].rect.left < 0:
+        if self.game.all_balls.effect == 5:
+            if self.game.all_balls.sprites()[0].rect.right > WIDTH:
+                self.game.all_players2.points += 1
+                self.game.highscore += 1
+        elif  self.game.all_balls.sprites()[0].rect.left < 0:
             self.points += 1
             self.game.highscore += 1
+
     def get_keys2(self):
         keys = pg.key.get_pressed()
         if keys[pg.K_k]:
@@ -253,6 +260,7 @@ class Ball(Sprite):
     def __init__(self, game, x, y):
         self.game = game
         self.groups = game.all_sprites, game.all_balls
+        game.all_balls.effect = 0
         Sprite.__init__(self, self.groups)
         self.image = pg.Surface((TILESIZE, TILESIZE))
         self.rect = self.image.get_rect()
@@ -261,10 +269,13 @@ class Ball(Sprite):
         self.rect.y = y * TILESIZE 
         self.x = x * TILESIZE
         self.y = y * TILESIZE
+        self.level = 0
         self.speed = 10
         self.vx, self.vy = 0, 0
-        self.hit_counter = 0        
-        Ball.effect = 0
+        self.hit_counter = 0
+        self.five = 1        
+        self.game.all_players1.points = 0
+        self.game.all_players1.highscore = 0
     
     def reset(self):
         if self.rect.right > WIDTH + 10:
@@ -325,9 +336,10 @@ class Ball(Sprite):
             if str(hits[0].__class__.__name__) == "Powerup": 
                     self.hit_counter += 1
                     if self.hit_counter > 1:
-                        self.effect = False
+                        self.game.all_balls.effect = 0
                         self.hit_counter = 0
-                    self.effect = effect = random.randint(1,6)
+                    self.game.all_balls.effect = random.randint(5,5) 
+                    effect = self.game.all_balls.effect
                     if effect == 1:
                         print('get faster...')
                         self.image.fill(PURPLE)
@@ -384,46 +396,90 @@ class Ball(Sprite):
                             hits[0].rect.center = old_center
                             self.rect.center = hits[0].rect.center
                     if effect == 5:
-                            print('get taller...')
-                            self.image.fill(BLUE)
-                            TILESIZE = 32 * 2
-                            self.image = pg.transform.scale_by(self.image, (1, 2)) 
-                            self.rect = self.image.get_rect()
-                            old_center = hits[0].rect.center
-                            hits[0].image = pg.transform.scale(hits[0].image, (32, 64))
-                            hits[0].rect = hits[0].image.get_rect()
-                            hits[0].rect.center = old_center
-                            self.rect.center = hits[0].rect.center
+                        self.five -= 1
+                        print('get inverted...')
+                        print(self.game.level)
+                        self.game.level = 4
+                        self.level += 1
+                        if self.level > 2:
+                            self.game.level = 2
+                            self.level = 0
+                            self.game.load_data('level2.txt')
+                            self.game.new()
+                        else:
+                            textLevel = "level" + str(self.game.level) + ".txt"
+                            self.game.load_data(textLevel)
+                            self.game.new()
+                            print(textLevel)
                     if effect == 6:
                             print('relfect...')
                             self.speed *= -1
+        hits = pg.sprite.spritecollide(self, self.game.all_wallos, False)
+        if hits:
+            print(self.game.all_players1.points)
+            self.game.all_players1.points += 1
+            self.game.all_players1.highscore += 1
+            self.speed *= -1
+            self.rect.x -= 32
+            self.vy += self.speed
+            self.vy *= -1
+            if self.vy == 0:
+                self.vy += self.speed
+            pg.mixer.Sound.play(self.game.ball_ping_snd)
 
                                                      
                             
                             
-                        
-            
-        hits = pg.sprite.spritecollide(self, self.game.all_players, False)
-        if hits:
-            if str(hits[0].__class__.__name__) == "Player":
-         # when it hits the player, it will move other side
-                # print("off the screen...")
-                self.speed *= -1
-                self.rect.x += 32
-                self.vy *= 1
-                if self.vy == 0:
+    def collide_with_players(self):                
+        if self.five == 0: 
+            print ('AAAAAAAAAAAAAAAAAAAAAAAAHHHHHHHHHHHHHHHHHHHHHHHH')
+            # while self.game.all_balls.effect == 5:
+            hits = pg.sprite.spritecollide(self, self.game.all_players, False)
+            if hits:
+                if str(hits[0].__class__.__name__) == "Player":
+                    self.speed *= -1
+                    self.rect.x -= 32
                     self.vy += self.speed
-                pg.mixer.Sound.play(self.game.ball_ping_snd)
-            if str(hits[0].__class__.__name__) == "Player2":
-            # when it hits the player2, it will move other side
-                #print("off the screen...")
-                self.speed *= -1
-                self.rect.x -= 32
-                self.vy += self.speed
-                self.vy *= -1
-                if self.vy == 0:
-                    self.vy += self.speed
-                pg.mixer.Sound.play(self.game.ball_ping_snd)
+                    self.vy *= -1
+                    if self.vy == 0:
+                        self.vy += self.speed
+                    if  self.game.all_balls.sprites()[0].rect.left < 0:
+                        self.game.all_players1.points += 1
+                        self.game.highscore += 1
+                    pg.mixer.Sound.play(self.game.ball_ping_snd)
+                if str(hits[0].__class__.__name__) == "Player2":
+                    self.speed *= -1
+                    self.rect.x += 32
+                    self.vy *= 1
+                    if self.vy == 0:
+                        self.vy += self.speed
+                    if self.game.all_balls.sprites()[0].rect.right > WIDTH:
+                        self.game.all_players2.points += 1  
+                        self.game.highscore += 1
+                    pg.mixer.Sound.play(self.game.ball_ping_snd)
+        # elif self.five != 0:
+        #     hits = pg.sprite.spritecollide(self, self.game.all_players, False)
+        #     if hits:
+        #         if str(hits[0].__class__.__name__) == "Player":
+        #  # when it hits the player, it will move other side
+        #             self.speed *= -1
+        #             self.rect.x += 32
+        #             self.vy *= 1
+        #             if self.vy == 0:
+        #                 self.vy += self.speed
+        #             pg.mixer.Sound.play(self.game.ball_ping_snd)
+        #         if str(hits[0].__class__.__name__) == "Player2":
+        #         # when it hits the player2, it will move other side
+        #             #print("off the screen...")
+        #             self.speed *= -1
+        #             self.rect.x -= 32
+        #             self.vy += self.speed
+        #             self.vy *= -1
+        #             if self.vy == 0:
+        #                 self.vy += self.speed
+        #             pg.mixer.Sound.play(self.game.ball_ping_snd)
+
+        
 
 
     def update(self):
@@ -440,10 +496,13 @@ class Ball(Sprite):
 
         self.reset()
 
+        self.collide_with_players()
+
         if self.rect.top > HEIGHT:
             self.rect.top = HEIGHT
         if self.rect.bottom < 0:
             self.rect.bottom = 0
+
 
 class Button(Sprite):
     def __init__(self, game, x, y):
@@ -452,7 +511,20 @@ class Button(Sprite):
         pg.sprite.Sprite.__init__(self, self.groups)
         self.image = pg.Surface((64, TILESIZE))
         self.rect = self.image.get_rect()
-        self.image.fill(YELLOW)
+        self.image.fill(RED)
+        self.rect.x = x * TILESIZE
+        self.rect.y = y * TILESIZE
+    def update(self):
+        pass
+
+class Button2 (Sprite):
+    def __init__(self, game, x, y):
+        self.game = game
+        self.groups = game.all_sprites, game.all_buttons
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.image = pg.Surface((64, TILESIZE))
+        self.rect = self.image.get_rect()
+        self.image.fill(GREEN)
         self.rect.x = x * TILESIZE
         self.rect.y = y * TILESIZE
     def update(self):
@@ -492,13 +564,34 @@ class Pusher(Sprite):
                 self.game.load_data(textLevel)
                 self.game.new()
                 print(textLevel)
-
+            if str(hits[0].__class__.__name__) == "Button2":
+                # self.game.new()
+                #From Ethan Chan 
+                print(self.game.level)
+                self.game.level += 2
+                textLevel = "level" + str(self.game.level) + ".txt"
+                self.game.load_data(textLevel)
+                self.game.new()
+                print(textLevel)
     def update(self): 
         self.get_keys()
 
         self.x += self.vx * self.game.dt
 
         self.enter(self.game.all_buttons, True) 
+
+class Wallo(Sprite):
+    def __init__(self, game, x, y):
+        self.game = game
+        self.groups = game.all_sprites, game.all_wallos
+        pg.sprite.Sprite.__init__(self, self.groups)
+        self.image = pg.Surface((TILESIZE, TILESIZE))
+        self.rect = self.image.get_rect()
+        self.image.fill(RED)
+        self.rect.x = x * TILESIZE
+        self.rect.y = y * TILESIZE
+    def update(self):
+        pass
 
 
 
